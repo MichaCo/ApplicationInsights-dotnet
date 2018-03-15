@@ -4,4 +4,23 @@
   <Import Project="Signing.targets" />
   <Import Project="AddXmlLanguage.targets" />
 
+  <PropertyGroup Label="BuildInfoTxt">
+    <BuildInfoTxtDependsOn>
+      $(BuildInfoTxtDependsOn);
+	  GenerateNuspec
+    </BuildInfoTxtDependsOn>
+	<BuildInfoTxtFilePath Condition="'$(BuildInfoTxtFilePath)'==''">$(OutputPath)buildInfo.txt</BuildInfoTxtFilePath>
+	<WriteBuildInfoTxt Condition="'$(WriteBuildInfoTxt)'==''">$(TF_BUILD)</WriteBuildInfoTxt>
+  </PropertyGroup>
+
+  <Target
+	Name="BuildInfoTxt"
+	DependsOnTargets="$(BuildInfoTxtDependsOn)"
+	AfterTargets="Build;$(BuildInfoTxtDependsOn)"
+	Condition="'@(NuGetPackOutput)' != '' And ('$(WriteBuildInfoTxt)' == 'true')">
+
+		<WriteLinesToFile File="$(BuildInfoTxtFilePath)" Lines="$(PackageVersion);@(NuGetPackOutput)" Overwrite="true"/>
+
+	</Target>
+
 </Project>
